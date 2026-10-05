@@ -188,7 +188,7 @@ textarea.control{min-height:120px; resize:vertical; line-height:1.55}
     <div id="step1">
       <div class="field">
         <label class="lbl" for="senha">Senha de acesso</label>
-        <input class="control" id="senha" type="password" value="@CRteste123" placeholder="Senha" autocomplete="off">
+        <input class="control" id="senha" type="password" placeholder="Senha" autocomplete="off">
       </div>
       <button class="btn btn-primary" id="btn-entrar" type="button">Entrar</button>
     </div>
@@ -328,9 +328,9 @@ textarea.control{min-height:120px; resize:vertical; line-height:1.55}
 
   /* ===== config ===== */
   var API_URL="https://script.google.com/macros/s/AKfycbyiSOJcaNnCNTTs0iYQ2lV6LYJZT1QObXbQtlD1Kg1ekKNc92Xjb0WJG7lg1PnmRo0/exec";
-  var AREAS=["institucional","locação","franquias/vendas","condomínios","expansão"];
-  var AREA_ORDER=["locação","franquias/vendas","condomínios","expansão","institucional"];
-  var AREA_LABEL={institucional:"Institucional","locação":"Locação","franquias/vendas":"Franquias/Vendas","condomínios":"Condomínios","expansão":"Expansão"};
+  var AREAS=["institucional","locação","condominios","expansão","franquias/vendas"];
+  var AREA_ORDER=["locação","franquias/vendas","condominios","expansão","institucional"];
+  var AREA_LABEL={institucional:"Institucional","locação":"Locação","franquias/vendas":"Franquias/Vendas","condominios":"Condomínios","expansão":"Expansão"};
   var TIPOS=["nota","insight","análise"];
   var TIPO_LABEL={nota:"Nota",insight:"Insight","análise":"Análise"};
   var MESES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
@@ -360,17 +360,21 @@ textarea.control{min-height:120px; resize:vertical; line-height:1.55}
 
   /* ===== API ===== */
   function api(payload){
-    return fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload),redirect:"follow"})
+    return fetch(API_URL,{
+      method:"POST",
+      mode:"cors",
+      credentials:"omit",
+      redirect:"follow",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
+    })
       .then(function(res){ return res.text(); })
       .then(function(txt){ var j; try{ j=JSON.parse(txt); }catch(e){ throw netErr(); } return j; })
       .catch(function(e){ if(e&&e.__net) throw e; throw netErr(); });
   }
   function netErr(){ return {__net:true, erro:"Não foi possível conectar ao servidor. Rode localmente ou em um ambiente que permita requisições (o preview do artefato pode bloquear)."}; }
   function listarUsuarios(senha){
-    return api({senha:senha, acao:"listarusuarios"}).then(function(r){
-      if(r && r.ok===false && r.erro==="Ação inválida"){ return api({senha:senha, acao:"listar_usuarios"}); }
-      return r;
-    });
+    return api({senha:senha, acao:"listar_usuarios"});
   }
 
   /* ===== LOGIN ===== */
